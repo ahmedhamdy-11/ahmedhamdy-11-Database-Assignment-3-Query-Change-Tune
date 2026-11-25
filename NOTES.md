@@ -1,0 +1,219 @@
+# Database Assignment 3 — Query, Change & Tune Data
+
+
+## Task 7 — Make It Faster
+
+### 7.1 — YEAR and MONTH Functions
+
+**Problem:** Applying YEAR() and MONTH() to the CreatedAtUtc column can prevent an efficient index seek.
+
+**Solution:** Use a date range instead of applying functions to the column.
+
+**Before:** [Original Query]
+
+**After:** [Optimized Query]
+
+
+### 7.2 — DATEDIFF Function
+
+**Problem:** Applying DATEDIFF() to PaidAtUtc can make the condition non-SARGable.
+
+**Solution:** Move the date calculation to the other side of the comparison.
+
+**Before:** [Original Query]
+
+**After:** [Optimized Query]
+
+
+### 7.3 — LEFT Function
+
+**Problem:** Applying LEFT() to LastName prevents an efficient index seek in this search pattern.
+
+**Solution:** Use LIKE with a prefix pattern.
+
+**Before:** [Original Query]
+
+**After:** [Optimized Query]
+
+
+### 7.4 — Arithmetic on ID
+
+**Problem:** Performing arithmetic on the indexed column can prevent an efficient index seek.
+
+**Solution:** Move the calculation to the constant value.
+
+**Before:** [Original Query]
+
+**After:** [Optimized Query]
+
+
+### 7.5 — Implicit Conversion
+
+**Problem:** The comparison value has a different data type from the InvoiceNumber column.
+
+**Solution:** Use a value with the same data type as the column to avoid unnecessary implicit conversion.
+
+**Before:** [Original Query]
+
+**After:** [Optimized Query]
+
+
+### 7.6 — UPPER Function
+
+**Problem:** Applying UPPER() to the Email column can prevent an efficient index seek.
+
+**Solution:** Check the database collation. If it is case-insensitive, the UPPER() function is unnecessary.
+
+**Before:** [Original Query]
+
+**After:** [Optimized Query]
+
+
+### 7.7 — Optional Parameter
+
+**Problem:** The OR condition with an optional parameter can produce a plan that is not efficient for every parameter value.
+
+**Solution:** Use OPTION (RECOMPILE) to generate a plan based on the current parameter value.
+
+**Before:** [Original Query]
+
+**After:** [Optimized Query]
+
+
+### 7.8 — Additional Example
+
+**Slow Query:** [Insert Query]
+
+**Problem:** [Explain the performance problem]
+
+**Optimized Query:** [Insert Query]
+
+**Explanation:** [Explain why the optimized query is faster]
+
+---
+
+## Task 8 — When the Estimate Is Wrong
+
+### 1. Problem Description
+
+SQL Server estimated fewer rows than the actual number of rows returned by the query.
+
+This caused the Sort operator to receive an insufficient memory grant.
+
+As a result, SQL Server used tempdb to store part of the sorting data. This is called a Sort Spill.
+
+### 2. Execution Plan
+
+**Screenshot:** [Insert Sort Spill Warning Screenshot]
+
+### 3. Explanation
+
+- **Cardinality Estimation:** SQL Server's process of estimating the number of rows returned by a query.
+- **Memory Grant:** Memory allocated to operators such as Sort and Hash Match.
+- **Sort Spill:** Happens when the allocated memory is insufficient and SQL Server uses tempdb.
+- **Spill Level:** Indicates the level of the spill operation and additional passes required to complete the operation.
+
+### 4. Solution
+
+[Explain how the estimation problem was fixed.]
+
+### 5. After Optimization
+
+**Screenshot:** [Insert Optimized Execution Plan]
+
+**Result:** [Explain whether the spill warning disappeared.]
+
+---
+
+## Task 9 — One of Each
+
+### 1. DISTINCT on a Non-Indexed Column
+
+**Query:** [Insert Query]
+
+**Execution Plan Screenshot:** [Insert Screenshot]
+
+**Operator Used:** [Insert Actual Operator Name]
+
+**Explanation:**
+
+SQL Server uses an operator to remove duplicate values.
+
+[Explain how the actual operator works.]
+
+### 2. A Cheaper Alternative
+
+**Operator Name:** Stream Aggregate
+
+**Explanation:**
+
+Stream Aggregate processes rows that are already sorted by the grouping key.
+
+It can remove duplicates efficiently because equal values appear next to each other.
+
+**What is needed?**
+
+An appropriate index that provides the required ordering can allow SQL Server to use Stream Aggregate.
+
+### 3. DISTINCT on a Unique Column
+
+**Query:** [Insert Query]
+
+**Execution Plan Screenshot:** [Insert Screenshot]
+
+**Explanation:**
+
+The selected column is already unique, so SQL Server may recognize that duplicate elimination is unnecessary.
+
+[Explain the actual execution plan.]
+
+---
+
+## Task 10 — The CTO's Question
+
+### When Should We Use Numbers and When Should We Use GUIDs for IDs?
+
+There are two common choices for primary keys: Numeric IDs (INT/BIGINT) and GUIDs (UNIQUEIDENTIFIER).
+
+### 1. Numeric IDs (INT / BIGINT)
+
+**Advantages:**
+- Smaller storage size (INT = 4 bytes, BIGINT = 8 bytes).
+- Smaller indexes.
+- Faster comparisons and joins in most cases.
+- Easy to read and understand.
+- Suitable for traditional database applications.
+
+**Disadvantages:**
+- Sequential IDs can be predictable.
+- Generating unique IDs across multiple independent systems requires coordination.
+- IDENTITY values are generated by the database.
+
+### 2. GUIDs (UNIQUEIDENTIFIER)
+
+**Advantages:**
+- 16 bytes in size.
+- Very low probability of generating duplicate IDs.
+- Can be generated independently by different applications.
+- Suitable for distributed systems.
+- IDs can be generated before inserting records into the database.
+
+**Disadvantages:**
+- Larger storage size than INT and BIGINT.
+- Larger indexes.
+- Random GUIDs can cause index fragmentation and page splits when used as clustered primary keys.
+- Comparisons and sorting can be more expensive.
+
+### 3. When Should We Use Each One?
+
+**Use INT or BIGINT when:**
+- Building traditional database applications.
+- Working with large numbers of related tables.
+- Storage and index performance are important.
+- IDs are generated by a central database.
+
+**Use GUID when:**
+ Working with distributed systems.
+ Multiple applications generate IDs independently.
+ Data needs to be synchronized or merged from different databases.
+ IDs must be generated before reaching the database.

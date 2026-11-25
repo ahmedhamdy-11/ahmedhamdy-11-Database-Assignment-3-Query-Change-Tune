@@ -1,0 +1,31 @@
+-- Task 6 — Reading the Plan
+
+
+USE LmsTrainingLab;
+GO
+
+-- 6.1: Measure work and execution time
+SET STATISTICS IO ON;
+SET STATISTICS TIME ON;
+GO
+
+-- The query behind the collections screen:
+SELECT TOP (15)
+    i.InvoiceNumber,
+    sp.StudentNumber,
+    i.TotalAmount - i.PaidAmount AS Remaining,
+    CASE 
+        WHEN i.DueAtUtc < DATEADD(DAY, -60, SYSUTCDATETIME()) THEN 'Urgent' 
+        ELSE 'Normal' 
+    END AS Urgency
+FROM finance.Invoices AS i
+INNER JOIN [identity].StudentProfiles AS sp ON sp.Id = i.StudentId
+WHERE i.PaidAmount < i.TotalAmount
+  AND i.DueAtUtc < SYSUTCDATETIME()
+ORDER BY Remaining DESC;
+GO
+
+SET STATISTICS IO OFF;
+SET STATISTICS TIME OFF;
+GO
+
