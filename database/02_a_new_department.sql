@@ -1,20 +1,13 @@
--- ============================================================================
--- DATABASE ASSIGNMENT 3: QUERY, CHANGE & TUNE DATA
 -- Task 2 — A New Department
--- Student: Ahmed Hamdy (ahmedhamdy-11)
--- Track: Backend .NET (Cycle 1 - Simulation Academy)
--- Database: LmsTrainingLab
--- Rules: No JOIN anywhere.
--- ============================================================================
+
 
 USE LmsTrainingLab;
 GO
 
 -- 2.1
--- A new department called Data Science & Artificial Intelligence, code DSAI.
 IF NOT EXISTS (SELECT 1 FROM academic.Departments WHERE Code = 'DSAI')
 BEGIN
-    INSERT INTO academic.Departments (
+    INSERT INTO [academic].[Departments] (
         Code,
         Name,
         Description,
@@ -34,13 +27,12 @@ END;
 GO
 
 -- 2.2
--- Its first course: Introduction to Data Analysis (DSAI-101), 3 credit hours, students pass with 60.
 DECLARE @DsaiDeptId INT;
-SELECT @DsaiDeptId = Id FROM academic.Departments WHERE Code = 'DSAI';
+SELECT @DsaiDeptId = Id FROM [academic].[Departments] WHERE Code = 'DSAI';
 
-IF NOT EXISTS (SELECT 1 FROM academic.Courses WHERE Code = 'DSAI-101')
+IF NOT EXISTS (SELECT 1 FROM [academic].[Courses] WHERE Code = 'DSAI-101')
 BEGIN
-    INSERT INTO academic.Courses (
+    INSERT INTO [academic].[Courses] (
         DepartmentId,
         Code,
         Title,
@@ -64,10 +56,9 @@ END;
 GO
 
 -- 2.3
--- The Summer 2027 term: classes from 15 June to 31 August 2027, registration from 1 May to 10 June 2027.
-IF NOT EXISTS (SELECT 1 FROM delivery.AcademicTerms WHERE AcademicYear = 2027 AND TermCode = 'SUMMER')
+IF NOT EXISTS (SELECT 1 FROM [delivery].[AcademicTerms] WHERE AcademicYear = 2027 AND TermCode = 'SUMMER')
 BEGIN
-    INSERT INTO delivery.AcademicTerms (
+    INSERT INTO [delivery].[AcademicTerms] (
         AcademicYear,
         TermCode,
         Name,
@@ -91,9 +82,7 @@ END;
 GO
 
 -- 2.4
--- An announcement to all students that Summer 2027 registration opens on 1 May.
--- General announcements have SectionId = NULL.
-IF NOT EXISTS (SELECT 1 FROM communication.Announcements WHERE Title = N'Summer 2027 Registration Opens May 1')
+IF NOT EXISTS (SELECT 1 FROM [communication].[Announcements] WHERE Title = N'Summer 2027 Registration Opens May 1')
 BEGIN
     INSERT INTO communication.Announcements (
         SectionId,
@@ -121,7 +110,6 @@ END;
 GO
 
 -- 2.5
--- A new role for Teaching Assistants.
 IF NOT EXISTS (SELECT 1 FROM [identity].Roles WHERE Code = 'TEACHING_ASSISTANT')
 BEGIN
     INSERT INTO [identity].Roles (

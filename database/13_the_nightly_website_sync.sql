@@ -1,13 +1,4 @@
--- ============================================================================
--- DATABASE ASSIGNMENT 3: QUERY, CHANGE & TUNE DATA
 -- Task 13 — The Nightly Website Sync
--- Student: Ahmed Hamdy (ahmedhamdy-11)
--- Track: Backend .NET (Cycle 1 - Simulation Academy)
--- Database: LmsTrainingLab
--- Rules: The entire sync must be a single statement. Build it and show what each run changed.
--- ============================================================================
-
-USE LmsTrainingLab;
 GO
 
 SET QUOTED_IDENTIFIER ON;
@@ -28,15 +19,13 @@ CREATE TABLE dbo.WebsiteCourseCatalog (
 );
 GO
 
--- ============================================================================
 -- TEST HARNESS: LIFECYCLE VERIFICATION (3-RUN DEMONSTRATION)
--- ============================================================================
 
 PRINT '=== RUN 1: INITIAL SYNC (Populate website with active courses) ===';
 MERGE dbo.WebsiteCourseCatalog AS target
 USING (
     SELECT Id AS CourseId, Code, Title, CreditHours, IsActive
-    FROM academic.Courses
+    FROM [academic].[Courses]
 ) AS source
 ON target.CourseId = source.CourseId
 WHEN MATCHED AND (

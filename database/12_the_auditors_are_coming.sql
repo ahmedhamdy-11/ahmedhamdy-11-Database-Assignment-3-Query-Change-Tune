@@ -1,11 +1,5 @@
--- ============================================================================
--- DATABASE ASSIGNMENT 3: QUERY, CHANGE & TUNE DATA
 -- Task 12 — The Auditors Are Coming
--- Student: Ahmed Hamdy (ahmedhamdy-11)
--- Track: Backend .NET (Cycle 1 - Simulation Academy)
--- Database: LmsTrainingLab
--- Rules: No JOIN anywhere. Both operations executed in the SAME single statement.
--- ============================================================================
+
 
 USE LmsTrainingLab;
 GO
@@ -15,9 +9,6 @@ SET ANSI_NULLS ON;
 GO
 
 -- 12.1
--- Auditors want a history of every pass-mark change: the course, the old mark,
--- the new mark, when, and by whom.
--- Change the pass mark of one department's courses and record the history in the SAME statement.
 
 DROP TABLE IF EXISTS academic.CoursePassMarkHistory;
 GO
@@ -55,8 +46,7 @@ WHERE DepartmentId = @DeptId;
 GO
 
 -- 12.2
--- Announcements that expired more than 6 months ago must be removed, but kept in an archive.
--- Do BOTH in one single statement using DELETE with OUTPUT INTO.
+
 
 DROP TABLE IF EXISTS communication.AnnouncementsArchive;
 GO
@@ -77,7 +67,7 @@ CREATE TABLE communication.AnnouncementsArchive (
 GO
 
 -- Delete expired announcements and insert into archive in ONE single statement:
-DELETE FROM communication.Announcements
+DELETE FROM [communication].[Announcements]
 OUTPUT 
     deleted.Id,
     deleted.SectionId,
